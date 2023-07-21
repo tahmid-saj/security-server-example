@@ -6,10 +6,22 @@ const cors = require("cors");
 const winston = require("winston");
 const helmet = require("helmet");
 
+const whitelist = ["http://example2.com"]
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
+}
+
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
-app.use(cors());
+app.use(cors(corsOptions));
+
 
 app.get("/", (req, res) => {
   res.cookie('session', '1', { httpOnly: true });
@@ -17,7 +29,7 @@ app.get("/", (req, res) => {
   res.set({
     'Content-Security-Policy': "script -src 'self' 'https://apis.google.com'",
   })
-  
+
   return res.send("Hello world");
 });
 
