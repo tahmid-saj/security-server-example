@@ -4,12 +4,20 @@ const morgan = require("morgan");
 const app = express();
 const cors = require("cors");
 const winston = require("winston");
+const helmet = require("helmet");
 
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
 app.use(cors());
 
 app.get("/", (req, res) => {
+  res.cookie('session', '1', { httpOnly: true });
+  res.cookie('session', '1', { secure: true });
+  res.set({
+    'Content-Security-Policy': "script -src 'self' 'https://apis.google.com'",
+  })
+  
   return res.send("Hello world");
 });
 
